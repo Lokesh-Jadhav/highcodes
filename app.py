@@ -350,7 +350,8 @@ Return ONLY valid JSON - no explanatory text before or after.
         pass
 
 if __name__ == '__main__':
-    print("🚀 Data Analytics API is running on port 8000")
+    port = int(os.environ.get('PORT', 8000))
+    print(f"🚀 Data Analytics API is running on port {port}")
     print("📡 Please ask your questions with curl request")
     print("   Example: curl -X POST \"http://localhost:8000/analyze\" -F \"question=What is 2+2?\"")
-    app.run(debug=True, host='0.0.0.0', port=8000, threaded=True)
+    app.run(debug=False, host='0.0.0.0', port=port, threaded=True)
