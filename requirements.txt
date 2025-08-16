@@ -1,0 +1,8 @@
+flask
+requests
+anthropic
+python-dotenv
+PyPDF2
+pandas
+beautifulsoup4
+lxml
