@@ -117,7 +117,7 @@ def run_script(script_path):
     except Exception as e:
         return "", str(e), 1
 
-def call_llm(prompt, max_tokens=4000, max_retries=3, model="claude-3-5-sonnet-20241022"):
+def call_llm(prompt, max_tokens=4000, max_retries=3, model="claude-3-5-sonnet-20241120"):
     for attempt in range(max_retries):
         try:
             message = client.messages.create(
@@ -238,7 +238,7 @@ Respond with ONLY the final JSON result containing the analysis.
 """
     
     print("Sending scraped data to LLM for analysis using Haiku...")
-    llm_response = call_llm(analysis_prompt, max_tokens=6000, model="claude-3-5-haiku-20241022")
+    llm_response = call_llm(analysis_prompt, max_tokens=6000, model="claude-3-5-haiku-20241120")
     
     try:
         json_match = re.search(r'\{.*\}', llm_response, re.DOTALL)
@@ -265,7 +265,7 @@ If everything is correct, respond with: VALIDATION_PASSED
 If there are issues, respond with: VALIDATION_FAILED: [explanation of issues]
 """
             
-            validation_response = call_llm(validation_prompt, max_tokens=500, model="claude-3-5-haiku-20241022")
+            validation_response = call_llm(validation_prompt, max_tokens=500, model="claude-3-5-haiku-20241120")
             
             if "VALIDATION_PASSED" in validation_response:
                 print("Validation passed - returning final result")
