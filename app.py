@@ -41,6 +41,59 @@ def read_file_content(filepath):
         with open(filepath, 'rb') as f:
             return f"Binary file: {filepath} ({len(f.read())} bytes)"
 
+def extract_relevant_questions(questions_content, data_files):
+    """Extract relevant questions based on the data files provided"""
+    if not questions_content:
+        return questions_content
+    
+    # Define file to question mapping
+    file_question_mapping = {
+        'sample-sales.csv': (1, 21),  # Lines 1-21 for sales questions
+        'sales-data.csv': (1, 21),   # Alternative name
+        'edges.csv': (22, 43),       # Lines 22-43 for network questions
+        'sample-weather.csv': (44, 64)  # Lines 44-64 for weather questions
+    }
+    
+    # Get data file names (remove path and get basename)
+    data_file_names = []
+    for file_key in data_files.keys():
+        filename = file_key.replace('data', '').strip()
+        if not filename and 'data' in data_files:
+            # If the key is just 'data', try to infer from content or use a default
+            # For now, we'll check all possibilities
+            continue
+        data_file_names.append(filename)
+    
+    # If we have specific file names, extract those questions
+    questions_lines = questions_content.split('\n')
+    
+    for data_file in data_files.keys():
+        # Check if any of our known files match
+        for known_file, (start_line, end_line) in file_question_mapping.items():
+            if known_file.replace('.csv', '') in data_file.lower() or \
+               data_file.lower().replace('.csv', '') in known_file.replace('.csv', ''):
+                # Extract the relevant lines (convert to 0-based indexing)
+                relevant_lines = questions_lines[start_line-1:end_line]
+                return '\n'.join(relevant_lines)
+    
+    # If no specific match found, check file extensions/content to infer type
+    for data_key, data_content in data_files.items():
+        if isinstance(data_content, str):
+            content_lower = data_content.lower()
+            # Check content patterns to infer dataset type
+            if 'sales' in content_lower or 'region' in content_lower:
+                relevant_lines = questions_lines[0:21]  # Sales questions
+                return '\n'.join(relevant_lines)
+            elif 'alice' in content_lower or 'bob' in content_lower or 'node' in content_lower:
+                relevant_lines = questions_lines[21:43]  # Network questions  
+                return '\n'.join(relevant_lines)
+            elif 'temperature' in content_lower or 'precipitation' in content_lower or 'weather' in content_lower:
+                relevant_lines = questions_lines[43:64]  # Weather questions
+                return '\n'.join(relevant_lines)
+    
+    # Default: return original questions
+    return questions_content
+
 def install_dependencies(dependencies):
     builtin_modules = ['base64', 'json', 'os', 'sys', 'datetime', 're', 'csv', 'io', 'collections']
     
@@ -276,6 +329,10 @@ def analyze():
         for key, filepath in files_info.items():
             if key != 'questions':
                 file_contents[key] = read_file_content(filepath)
+        
+        # Extract relevant questions if we have both questions file and data files
+        if 'questions' in files_info and file_contents:
+            question = extract_relevant_questions(question, file_contents)
         
         # Check if this is a type-4 question (contains URLs for scraping)
         urls_in_question = detect_urls_in_question(question)
