@@ -314,8 +314,34 @@ def home():
     </html>
     '''
 
-@app.route('/analyze', methods=['POST'])
+@app.route('/analyze', methods=['GET', 'POST'])
 def analyze():
+    if request.method == 'GET':
+        return '''
+        <html>
+        <head><title>Analytics API - POST Required</title></head>
+        <body style="font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5;">
+            <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <h1 style="color: #333;">📊 Analytics API Endpoint</h1>
+                <p style="font-size: 18px; color: #666;">This endpoint requires POST method, not GET.</p>
+                
+                <h3 style="color: #333;">💡 Example Usage:</h3>
+                <div style="background: #f8f8f8; padding: 15px; border-left: 4px solid #007acc; margin: 15px 0;">
+                    <h4>Simple Question:</h4>
+                    <code>curl -X POST "https://highcodes.onrender.com/analyze" -F "question=What is 2+2?"</code>
+                    
+                    <h4>With Data Files:</h4>
+                    <code>curl -X POST "https://highcodes.onrender.com/analyze" -F "questions=@questions.txt" -F "data=@data.csv"</code>
+                    
+                    <h4>Web Scraping:</h4>
+                    <code>curl -X POST "https://highcodes.onrender.com/analyze" -F "question=Who won FIFA World Cup 2022?"</code>
+                </div>
+                
+                <p style="color: #888; font-size: 14px;">✨ Use POST method with form data to get JSON responses</p>
+            </div>
+        </body>
+        </html>
+        '''
     try:
         files_info = save_uploaded_files(request)
         
